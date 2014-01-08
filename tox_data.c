@@ -166,7 +166,7 @@ int data_change_key(tox_data *data, uint8_t *old_password, uint8_t *new_password
     return 0;
 }
 
-int data_write_messenger(uint8_t *buffer, size_t length) {
+int data_write_messenger(tox_data *data, uint8_t *buffer, size_t length) {
 	if(data->locked)
         return -1;
 
@@ -181,7 +181,7 @@ int data_write_messenger(uint8_t *buffer, size_t length) {
     return 0;
 }
 
-size_t data_read_messenger(uint8_t **buffer) {
+size_t data_read_messenger(tox_data *data, uint8_t **buffer) {
     if(data->locked)
         return -1;
 
