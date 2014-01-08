@@ -1,3 +1,5 @@
+#include "tox_data.h"
+
 void _gen_key(tox_data *data, uint8_t *password, uint8_t *key) {
 	scrypt(password, strlen(password), data->salt, 24, data->scrypt_n, data->scrypt_r, data->scrypt_p, key, 32);
 }
@@ -8,8 +10,21 @@ int _gen_key_new(tox_data *data, uint8_t *password) {
 	_gen_key(data, password, data->encrypted_key);
 }
 
+void _data_init(tox_data *tox) {
+	data->file_path = NULL;
+	data->locked = true;
+
+	data->scrypt_n = 15;
+	data->scrypt_r = 8;
+	data->scrypt_p = 1;
+
+	data->name = NULL;
+	data->data = NULL;
+}
+
 tox_data* data_init_new(uint8_t *path, uint8_t *username, uint8_t *password) {
 	tox_data *data = (tox_data*)malloc(sizeof tox_data);
+	_data_init(data);
 
 	file_path = (uint8_t*)malloc(strlen(path));
 	strcpy(file_path, path);
@@ -25,6 +40,7 @@ tox_data* data_init_new(uint8_t *path, uint8_t *username, uint8_t *password) {
 
 tox_data* data_init_load(uint8_t *path) {
 	tox_data *data = (tox_data*)malloc(sizeof tox_data);
+	_data_init(data);
 
 	file_path = (uint8_t*)malloc(strlen(path));
 	strcpy(file_path, path);

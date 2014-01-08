@@ -29,8 +29,8 @@
  */
 
 typedef struct tox_data {
-	uint8_t *file_path = NULL;
-	bool locked = true;
+	uint8_t *file_path;
+	bool locked;
 
 	uint8_t encrypted_key[crypto_secretbox_KEYBYTES], //Sodium encrypt key, 32 bytes.
 			nonce[crypto_secretbox_NONCEBYTES], //Sodium nonce, 24 bytes.
@@ -40,12 +40,12 @@ typedef struct tox_data {
 	 * Percival recommends these values for interactive logins - we can always adjust them later
 	 * for increased difficulty.
 	 */
-	uint32_t scrypt_n = 15,
-			 scrypt_r = 8,
-			 scrypt_p = 1;
+	uint32_t scrypt_n,
+			 scrypt_r,
+			 scrypt_p;
 
 	//The profile's name and last save time.
-	uint8_t *name = NULL;
+	uint8_t *name;
 	uint64_t time_saved;
 
 	//The encrypted block's file offset and length.
@@ -53,7 +53,7 @@ typedef struct tox_data {
 	uint64_t block_two_length;
 
 	//The unencrypted messenger data.
-	uint8_t *data = NULL;
+	uint8_t *data;
 	size_t data_length;
 } tox_data;
 
