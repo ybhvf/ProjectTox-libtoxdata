@@ -12,7 +12,7 @@ void _gen_key_new(tox_data *data, uint8_t *password) {
 
 void _data_init(tox_data *data) {
 	data->file_path = NULL;
-    data->locked = 1;
+	data->locked = 1;
 
 	data->scrypt_n = 15;
 	data->scrypt_r = 8;
@@ -26,15 +26,17 @@ tox_data* data_init_new(char *path, uint8_t *username, uint8_t *password) {
 	tox_data *data = (tox_data*)malloc(sizeof(tox_data));
 	_data_init(data);
 
-	data->file_path = (char*)malloc(strlen(path));
-	strcpy(data->file_path, path);
+	size_t str_size = strlen(path) + 1;
+	data->file_path = (char*)malloc(str_size);
+	strncpy(data->file_path, path, str_size);
 
-	data->name = (uint8_t*)malloc(strlen((char*)username));
-	strcpy((char*)data->name, (char*)username);
+	str_size = strlen((char*)username) + 1;
+	data->name = (uint8_t*)malloc(str_size);
+	strncpy((char*)data->name, (char*)username, str_size);
 
 	_gen_key_new(data, password);
-	memset(password, 0, strlen((char*)password));
-    data->locked = 0;
+	memset(password, 0, strlen((char*)password) + 1);
+	data->locked = 0;
 
 	return data;
 }
@@ -43,8 +45,9 @@ tox_data* data_init_load(char *path) {
 	tox_data *data = (tox_data*)malloc(sizeof(tox_data));
 	_data_init(data);
 
-	data->file_path = (char*)malloc(strlen(path));
-	strcpy(data->file_path, path);
+	size_t str_size = strlen(path) + 1;
+	data->file_path = (char*)malloc(str_size);
+	strncpy(data->file_path, path, str_size);
 
 	FILE *file = fopen(path, "r");
 	if(file == NULL)
@@ -52,7 +55,7 @@ tox_data* data_init_load(char *path) {
 
 	//check magic
 	char magic[4];
-    fread(magic, 1, 4, file);
+	fread(magic, 1, 4, file);
 	if(memcmp(magic,&"libe",4) != 0)
 		return NULL;
 
@@ -212,7 +215,7 @@ int data_flush(tox_data *data) {
 		return -1;
 
 	/* Create block two */
-	size_t block_two_size = data->data_length + 36;
+	uint64_t block_two_size = data->data_length + 36;
 	uint8_t block_two_plaintext[block_two_size], block_two_encrypted[block_two_size];
 	uint8_t magic2[4] = {0x72, 0x74, 0x61, 0x73};
 

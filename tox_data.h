@@ -27,8 +27,8 @@
  */
 
 typedef struct tox_data {
-    char *file_path;
-    int locked;
+	char *file_path;
+	int locked;
 
 	uint8_t encrypted_key[crypto_secretbox_KEYBYTES], //Sodium encrypt key, 32 bytes.
 			nonce[crypto_secretbox_NONCEBYTES], //Sodium nonce, 24 bytes.
