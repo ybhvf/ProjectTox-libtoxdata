@@ -57,7 +57,7 @@ typedef struct tox_data {
 	size_t data_length;
 } tox_data;
 
-tox_data* data_init_new(uint8_t *path, uint8_t *data_name);
+tox_data* data_init_new(uint8_t *path, uint8_t *data_name, uint8_t *password);
 tox_data* data_init_load(uint8_t *path);
 void data_close(tox_data *data);
 
