@@ -5,9 +5,6 @@
 #include <sodium.h>
 #include <scrypt-jane.h>
 
-#define SCRYPT_SALSA true
-#define SCRYPT_SHA256 true
-
 /* Profile Save Format
  * ==============
  *
@@ -29,8 +26,8 @@
  */
 
 typedef struct tox_data {
-	uint8_t *file_path;
-	bool locked;
+    char *file_path;
+    int locked;
 
 	uint8_t encrypted_key[crypto_secretbox_KEYBYTES], //Sodium encrypt key, 32 bytes.
 			nonce[crypto_secretbox_NONCEBYTES], //Sodium nonce, 24 bytes.
@@ -57,8 +54,8 @@ typedef struct tox_data {
 	size_t data_length;
 } tox_data;
 
-tox_data* data_init_new(uint8_t *path, uint8_t *data_name, uint8_t *password);
-tox_data* data_init_load(uint8_t *path);
+tox_data* data_init_new(char *path, uint8_t *data_name, uint8_t *password);
+tox_data* data_init_load(char *path);
 void data_close(tox_data *data);
 
 int data_unlock(tox_data *data, uint8_t *password);
