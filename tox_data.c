@@ -12,7 +12,7 @@ void _gen_key_new(tox_data *data, uint8_t *password) {
 
 void _data_init(tox_data *data) {
 	data->file_path = NULL;
-	data->locked = 0;
+    data->locked = 1;
 
 	data->scrypt_n = 15;
 	data->scrypt_r = 8;
@@ -34,6 +34,7 @@ tox_data* data_init_new(char *path, uint8_t *username, uint8_t *password) {
 
 	_gen_key_new(data, password);
 	memset(password, 0, strlen((char*)password));
+    data->locked = 0;
 
 	return data;
 }
@@ -51,7 +52,7 @@ tox_data* data_init_load(char *path) {
 
 	//check magic
 	char magic[4];
-	fgets(magic, 4, file);
+    fread(magic, 1, 4, file);
 	if(memcmp(magic,&"libe",4) != 0)
 		return NULL;
 
