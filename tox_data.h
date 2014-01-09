@@ -4,11 +4,12 @@
 
 #include <tox.h>
 #include <sodium.h>
-#include <scrypt-jane.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <scrypt-jane.h>
 
 /* "Profile" Save Format
  * ==============
