@@ -1,3 +1,6 @@
+#ifndef TOX_DATA_H
+#define TOX_DATA_H
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -126,3 +129,5 @@ size_t data_read_messenger(tox_data *data, uint8_t **buffer);
  *			-3 if FILE error
  */
 int data_flush(tox_data *data);
+
+#endif
