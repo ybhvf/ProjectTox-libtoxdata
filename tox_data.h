@@ -1,3 +1,6 @@
+#ifndef TOX_DATA_H
+#define TOX_DATA_H
+
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -134,4 +137,6 @@ int data_flush(tox_data *data);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
