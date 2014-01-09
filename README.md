@@ -37,7 +37,7 @@ It's also suggested that *.tox* is used as the extension for these files (e.g. *
 * Add __SCRYPT\_SALSA__ & __SCRYPT\_SHA256__ to your defines.
 * Add **-no-integrated-as** to your CFLAGS if you use clang.
 
-###Example
+### Example
 ````C
 tox_data *profile = data_init_load("/home/user/.config/tox/whatever.tox");
 data_unlock(profile, "password1");
@@ -45,3 +45,6 @@ uint8_t *buffer;
 size_t size = data_read_messenger(profile, &buffer);
 tox_load(tox, buffer, size);
 ````
+
+### Current Issues
+* Endianess & padding haven't been tackled yet here or in ToxCore. Which means that these saves will be fine among similar machines, but good luck going from your laptop to your raspberry pi.
