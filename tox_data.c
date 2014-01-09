@@ -99,7 +99,7 @@ void data_close(tox_data *data) {
 
 int data_unlock(tox_data *data, uint8_t *password) {
 	if(!data->locked)
-		return -1;
+		return 0;
 
 	//load encrypted block
 	FILE *file = fopen(data->file_path, "r");
@@ -123,7 +123,7 @@ int data_unlock(tox_data *data, uint8_t *password) {
 	char magic[4];
 	memcpy(magic, block_two_plaintext + 32, 4);
 	if(memcmp(magic, &"rtas",4) != 0)
-		return -1;
+		return -2;
 
 	//load for future use
 	if(data->data != NULL)
@@ -176,11 +176,10 @@ int data_change_key(tox_data *data, uint8_t *old_password, uint8_t *new_password
 
 	/* Check to see if keys match.
 	 * Although there's no cryptographic need to do so, it ensures that whomever's using
-	 * the profile should have access to it, rather than having stumbled upon an unlocked
-	 * computer.
+	 * the profile should have access.
 	 */
 	if(strcmp((const char*)key, (const char*)data->encrypted_key) != 0)
-		return -1;
+		return -2;
 
 	_gen_key_new(data, new_password);
 	return 0;
@@ -227,7 +226,7 @@ int data_flush(tox_data *data) {
 
 	/* Encrypt block two */
 	if(crypto_secretbox(block_two_encrypted, block_two_plaintext, block_two_size, data->nonce, data->encrypted_key) != 0)
-		return -1;
+		return -2;
 	memset(block_two_plaintext, 0, block_two_size);
 
 	FILE *file = fopen(data->file_path, "w+");
@@ -261,6 +260,7 @@ int data_flush(tox_data *data) {
 	fwrite(&block_two_size, 8, 1, file);
 	fwrite(block_two_encrypted, 1, block_two_size, file);
 
-	fclose(file);
+	if(fclose(file) != 0)
+		return -3;
 	return 0;
 }
