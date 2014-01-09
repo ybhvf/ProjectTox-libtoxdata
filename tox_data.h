@@ -36,9 +36,9 @@ typedef struct tox_data {
 			nonce[crypto_secretbox_NONCEBYTES], //Sodium nonce, 24 bytes.
 			salt[24]; //Scrypt salt, 24 bytes.
 
-	/* These values were sourced from here: https://www.tarsnap.com/scrypt/scrypt-slides.pdf
-	 * Percival recommends these values for interactive logins - we can always adjust them later
-	 * for increased difficulty.
+	/* The values used (N=12,r=8,p=1) were sourced from here: https://www.tarsnap.com/scrypt/scrypt-slides.pdf
+	 * Percival recommends larger (N=14) values for interactive logins - I've lessened them slightly to make
+	 * decryption acceptable on slower machines. One can always specify harder values.
 	 */
 	uint32_t scrypt_n,
 			 scrypt_r,

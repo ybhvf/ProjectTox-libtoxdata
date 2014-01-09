@@ -14,7 +14,7 @@ void _data_init(tox_data *data) {
 	data->file_path = NULL;
 	data->locked = 1;
 
-	data->scrypt_n = 15;
+	data->scrypt_n = 12;
 	data->scrypt_r = 8;
 	data->scrypt_p = 1;
 
@@ -131,12 +131,6 @@ int data_unlock(tox_data *data, uint8_t *password) {
 	data->data_length = data->block_two_length - 36;
 	data->data = (uint8_t*)malloc(data->data_length);
 	memcpy(data->data, block_two_plaintext + 36, data->data_length);
-
-	//check against loaded scrypt values being too small
-	if(data->scrypt_n < 15)
-		data->scrypt_n = 15;
-	if(data->scrypt_r < 8)
-		data->scrypt_r = 8;
 
 	/* Generate a new key for future saving.
 	 * This somewhat more secure than keeping the user password around in plaintext in
