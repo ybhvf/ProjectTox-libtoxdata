@@ -6,6 +6,10 @@
 #include <sodium.h>
 #include <scrypt-jane.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* "Profile" Save Format
  * ==============
  *
@@ -126,3 +130,7 @@ size_t data_read_messenger(tox_data *data, uint8_t **buffer);
  *			-3 if FILE error
  */
 int data_flush(tox_data *data);
+
+#ifdef __cplusplus
+}
+#endif
