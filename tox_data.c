@@ -19,7 +19,7 @@ void _data_init(tox_data *data) {
 	data->scrypt_p = 1;
 
 	data->name = NULL;
-	data->data = NULL;
+	data->_data = NULL;
 }
 
 tox_data* data_init_new(char *path, uint8_t *username, uint8_t *password) {
@@ -83,8 +83,8 @@ tox_data* data_init_load(char *path) {
 	fread(data->nonce, 1, 24, file);
 
 	//block two
-	fread(&data->block_two_length, 8, 1, file);
-	data->block_two_offset = ftell(file);
+	fread(&data->_block_two_length, 8, 1, file);
+	data->_block_two_offset = ftell(file);
 
 	fclose(file);
 	return data;
@@ -93,7 +93,7 @@ tox_data* data_init_load(char *path) {
 void data_close(tox_data *data) {
 	free(data->file_path);
 	free(data->name);
-	free(data->data);
+	free(data->_data);
 	free(data);
 }
 
@@ -104,11 +104,11 @@ int data_unlock(tox_data *data, uint8_t *password) {
 	//load encrypted block
 	FILE *file = fopen(data->file_path, "r");
 
-	uint8_t block_two_encrypted[data->block_two_length],
-			block_two_plaintext[data->block_two_length];
+	uint8_t block_two_encrypted[data->_block_two_length],
+			block_two_plaintext[data->_block_two_length];
 
-	fseek(file, data->block_two_offset, 0);
-	fread(block_two_encrypted, 1, data->block_two_length, file);
+	fseek(file, data->_block_two_offset, 0);
+	fread(block_two_encrypted, 1, data->_block_two_length, file);
 
 	fclose(file);
 
@@ -116,7 +116,7 @@ int data_unlock(tox_data *data, uint8_t *password) {
 	_gen_key(data, password, data->encrypted_key);
 
 	//decrypt block
-	if(crypto_secretbox_open(block_two_plaintext, block_two_encrypted, data->block_two_length, data->nonce, data->encrypted_key) != 0)
+	if(crypto_secretbox_open(block_two_plaintext, block_two_encrypted, data->_block_two_length, data->nonce, data->encrypted_key) != 0)
 		return -1;
 
 	//check magic
@@ -126,11 +126,11 @@ int data_unlock(tox_data *data, uint8_t *password) {
 		return -2;
 
 	//load for future use
-	if(data->data != NULL)
-		free(data->data);
-	data->data_length = data->block_two_length - 36;
-	data->data = (uint8_t*)malloc(data->data_length);
-	memcpy(data->data, block_two_plaintext + 36, data->data_length);
+	if(data->_data != NULL)
+		free(data->_data);
+	data->_data_length = data->_block_two_length - 36;
+	data->_data = (uint8_t*)malloc(data->_data_length);
+	memcpy(data->_data, block_two_plaintext + 36, data->_data_length);
 
 	/* Generate a new key for future saving.
 	 * This somewhat more secure than keeping the user password around in plaintext in
@@ -139,7 +139,7 @@ int data_unlock(tox_data *data, uint8_t *password) {
 	 */
 	_gen_key_new(data, password);
 
-	memset(block_two_plaintext, 0, data->block_two_length);
+	memset(block_two_plaintext, 0, data->_block_two_length);
 
 	data->locked = 0;
 
@@ -153,7 +153,7 @@ int data_lock(tox_data *data) {
 
 	data_flush(data);
 
-	memset(data->data, 0, data->data_length);
+	memset(data->_data, 0, data->_data_length);
 	memset(data->encrypted_key, 0, 32);
 
 	data->locked = 1;
@@ -183,24 +183,30 @@ int data_write_messenger(tox_data *data, uint8_t *buffer, size_t length) {
 	if(data->locked)
 		return -1;
 
-	if(data->data != NULL)
-		free(data->data);
+	if(data->_data != NULL)
+		free(data->_data);
 
-	data->data_length = length;
-	data->data = (uint8_t*)malloc(length);
-	memcpy(data->data, buffer, length);
+	data->_data_length = length;
+	data->_data = (uint8_t*)malloc(length);
+	memcpy(data->_data, buffer, length);
 	data_flush(data);
 
 	return 0;
 }
 
-size_t data_read_messenger(tox_data *data, uint8_t **buffer) {
+size_t data_messenger_size(tox_data *data) {
 	if(data->locked)
 		return -1;
 
-	*buffer = (uint8_t*)malloc(data->data_length);
-	memcpy(*buffer, data->data, data->data_length);
-	return data->data_length;
+	return data->_data_length;
+}
+
+int data_read_messenger(tox_data *data, uint8_t *buffer) {
+	if(data->locked)
+		return -1;
+
+	memcpy(buffer, data->_data, data->_data_length);
+	return 0;
 }
 
 int data_flush(tox_data *data) {
@@ -208,12 +214,12 @@ int data_flush(tox_data *data) {
 		return -1;
 
 	/* Create block two */
-	uint64_t block_two_size = data->data_length + 36;
+	uint64_t block_two_size = data->_data_length + 36;
 	uint8_t block_two_plaintext[block_two_size], block_two_encrypted[block_two_size];
 	uint8_t magic2[4] = {0x72, 0x74, 0x61, 0x73};
 
 	memcpy(block_two_plaintext + 32, magic2, 4);
-	memcpy(block_two_plaintext + 32 + 4, data->data, data->data_length);
+	memcpy(block_two_plaintext + 32 + 4, data->_data, data->_data_length);
 
 	//required zerobytes
 	memset(block_two_plaintext, 0, 32);

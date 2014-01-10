@@ -57,12 +57,12 @@ typedef struct tox_data {
 	uint64_t time_saved;
 
 	//The encrypted block's file offset and length.
-	size_t block_two_offset;
-	uint64_t block_two_length;
+	size_t _block_two_offset;
+	uint64_t _block_two_length;
 
 	//The unencrypted messenger data.
-	uint8_t *data;
-	size_t data_length;
+	uint8_t *_data;
+	size_t _data_length;
 } tox_data;
 
 /* NOTE - all string function parameters must be nul-teminated (path, password, et cetera) */
@@ -119,12 +119,20 @@ int data_change_key(tox_data *data, uint8_t *old_password, uint8_t *new_password
  */
 int data_write_messenger(tox_data *data, uint8_t *buffer, size_t length);
 
-/* Copies the messenger from the given tox_data
+/* Returns the size of the loaded messenger
  * 
  * returns	the size of the tox messenger if success
  *			-1 if the file is locked
  */
-size_t data_read_messenger(tox_data *data, uint8_t **buffer);
+size_t data_messenger_size(tox_data *data);
+
+/* Copies the messenger from the given tox_data to the given buffer
+ * The buffer must be preallocated to data_messenger_size() bytes.
+ * 
+ * returns	0 if success
+ *			-1 if the file is locked
+ */
+int data_read_messenger(tox_data *data, uint8_t *buffer);
 
 /* Writes the given tox_data to the disk
  * 
