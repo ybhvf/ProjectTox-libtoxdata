@@ -156,7 +156,7 @@ int data_lock(tox_data *data) {
     memset(data->_data, 0, data->_data_length);
     memset(data->encrypted_key, 0, 32);
 
-    free data->_data;
+    free(data->_data);
     data->_data = NULL;
 
     data->locked = 1;
