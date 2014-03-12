@@ -35,7 +35,7 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
 
     memset(block_two_plaintext, 0, 32);
     if(crypto_secretbox(block_two_encrypted, block_two_plaintext, block_two_size, nonce, encrypted_key) != 0)
-        return -2;
+        return -1;
 
     //prepare block one
 
@@ -85,11 +85,14 @@ int tox_load_encrypted(Tox *tox, uint8_t *data, uint32_t length, uint8_t *key, u
 
     int offset = 0;
 
+    if(length < 72)
+        return -1;
+
     //check magic
     char magic[4];
     memcpy(magic, data, 4);
     if(memcmp(magic,&"libe",4) != 0)
-        return NULL;
+        return -1;
     offset += 4;
 
     //scrypt vars
@@ -110,6 +113,9 @@ int tox_load_encrypted(Tox *tox, uint8_t *data, uint32_t length, uint8_t *key, u
     memcpy(&block_two_length, data + offset, 8);
     offset += 8;
 
+    if(length < block_two_length + 72)
+        return -1;
+
     uint8_t block_two_encrypted[block_two_length],
             block_two_plaintext[block_two_length];
 
@@ -125,7 +131,7 @@ int tox_load_encrypted(Tox *tox, uint8_t *data, uint32_t length, uint8_t *key, u
     //check magic
     memcpy(magic, block_two_plaintext + 32, 4);
     if(memcmp(magic, &"rtas",4) != 0)
-        return -2;
+        return -1;
 
     tox_load(tox, block_two_plaintext + 36, block_two_length - 36);
 
