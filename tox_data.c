@@ -6,7 +6,7 @@ uint32_t tox_size_encrypted(Tox *tox) {
 
 int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_length) {
     /* The values used (N=14,r=8,p=1) were sourced from here: https://www.tarsnap.com/scrypt/scrypt-slides.pdf
-     * Percival reccommend these values for interactive logins.
+     * Percival recommends these values for interactive logins.
      */
     uint32_t scrypt_n = 14,
              scrypt_r = 8,
