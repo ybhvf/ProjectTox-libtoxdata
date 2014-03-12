@@ -12,11 +12,11 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
              scrypt_r = 8,
              scrypt_p = 1;
 
-    uint8_t  encrypted_key[crypto_secretbox_KEYBYTES];
+    uint8_t  encrypted_key[crypto_secretbox_KEYBYTES],
              nonce[crypto_secretbox_NONCEBYTES],
-             salt[24],
+             salt[24];
 
-    uint64_t block_two_length = tox_size(tox) + 36;
+    uint64_t block_two_size = tox_size(tox) + 36;
 
     //generate encryption key
     randombytes(salt, 24);
@@ -31,7 +31,7 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
     uint8_t magic2[4] = {0x72, 0x74, 0x61, 0x73};
     memcpy(magic2, block_two_plaintext + 32, 4);
 
-    tox_save(tox, block_two_plaintext + 32 + 4)
+    tox_save(tox, block_two_plaintext + 32 + 4);
 
     memset(block_two_plaintext, 0, 32);
     if(crypto_secretbox(block_two_encrypted, block_two_plaintext, block_two_size, nonce, encrypted_key) != 0)
@@ -43,7 +43,7 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
 
     //magic
     uint8_t magic1[4] = {0x6c, 0x69, 0x62, 0x65};
-    memcpy(magic1, data, 4, file);
+    memcpy(magic1, data, 4);
     offset += 4;
 
     //scrypt values
@@ -123,7 +123,6 @@ int tox_load_encrypted(Tox *tox, uint8_t *data, uint32_t length, uint8_t *key, u
         return -1;
 
     //check magic
-    char magic[4];
     memcpy(magic, block_two_plaintext + 32, 4);
     if(memcmp(magic, &"rtas",4) != 0)
         return -2;
