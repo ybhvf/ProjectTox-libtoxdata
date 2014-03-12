@@ -29,7 +29,7 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
     //prepare block two
 
     uint8_t magic2[4] = {0x72, 0x74, 0x61, 0x73};
-    memcpy(magic2, block_two_plaintext + 32, 4);
+    memcpy(block_two_plaintext + 32, magic2, 4);
 
     tox_save(tox, block_two_plaintext + 32 + 4);
 
@@ -43,27 +43,27 @@ int tox_save_encrypted(Tox *tox, uint8_t *data, uint8_t *key, uint16_t key_lengt
 
     //magic
     uint8_t magic1[4] = {0x6c, 0x69, 0x62, 0x65};
-    memcpy(magic1, data, 4);
+    memcpy(data, magic1, 4);
     offset += 4;
 
     //scrypt values
-    memcpy(&scrypt_n, data + offset, 4);
+    memcpy(data + offset, &scrypt_n, 4);
     offset += 4;
-    memcpy(&scrypt_r, data + offset, 4);
+    memcpy(data + offset, &scrypt_r, 4);
     offset += 4;
-    memcpy(&scrypt_p, data + offset, 4);
+    memcpy(data + offset, &scrypt_p, 4);
     offset += 4;
 
     //salt & nonce
-    memcpy(salt, data + offset, 24);
+    memcpy(data + offset, salt, 24);
     offset += 24;
-    memcpy(nonce, data + offset, 24);
+    memcpy(data + offset, nonce, 24);
     offset += 24;
 
     //block two
-    memcpy(&block_two_size, data + offset, 8);
+    memcpy(data + offset, &block_two_size, 8);
     offset += 8;
-    memcpy(block_two_encrypted, data + offset, block_two_size);
+    memcpy(data + offset, block_two_encrypted, block_two_size);
 
     //a nice gesture
     memset(block_two_plaintext, 0, block_two_size);
@@ -87,33 +87,33 @@ int tox_load_encrypted(Tox *tox, uint8_t *data, uint32_t length, uint8_t *key, u
 
     //check magic
     char magic[4];
-    memcpy(data, magic, 4);
+    memcpy(magic, data, 4);
     if(memcmp(magic,&"libe",4) != 0)
         return NULL;
     offset += 4;
 
     //scrypt vars
-    memcpy(data + offset, &scrypt_n, 4);
+    memcpy(&scrypt_n, data + offset, 4);
     offset += 4;
-    memcpy(data + offset, &scrypt_r, 4);
+    memcpy(&scrypt_r, data + offset, 4);
     offset += 4;
-    memcpy(data + offset, &scrypt_p, 4);
+    memcpy(&scrypt_p, data + offset, 4);
     offset += 4;
 
     //salt & nonce
-    memcpy(data + offset, salt, 24);
+    memcpy(salt, data + offset, 24);
     offset += 24;
-    memcpy(data + offset, nonce, 24);
+    memcpy(nonce, data + offset, 24);
     offset += 24;
 
     //block two
-    memcpy(data + offset, &block_two_length, 8);
+    memcpy(&block_two_length, data + offset, 8);
     offset += 8;
 
     uint8_t block_two_encrypted[block_two_length],
             block_two_plaintext[block_two_length];
 
-    memcpy(data + offset, block_two_encrypted, block_two_length);
+    memcpy(block_two_encrypted, data + offset, block_two_length);
 
     //derive key from file
     scrypt(key, key_length, salt, 24, scrypt_n, scrypt_r, scrypt_p, encrypted_key, 32);
