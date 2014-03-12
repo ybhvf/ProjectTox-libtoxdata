@@ -32,8 +32,10 @@ An addition to [ProjectTox-Core](https://github.com/irungentoo/ProjectTox-Core/)
 
 ### Example
 ````C
-uint8_t data[tox_size_encrypted(tox)];
+uint32_t length = tox_size_encrypted(tox);
+uint8_t data[length];
 tox_save_encrypted(tox, data, "pass1", strlen("pass1"));
+tox_load_encrypted(tox, data, length, "pass1", strlen("pass1"));
 ````
 
 ### Current Issues
